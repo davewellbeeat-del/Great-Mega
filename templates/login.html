@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#061326">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>GREAT MEGA | Log in</title>
+  <script src="{{ url_for('static', filename='js/theme.js', v=2) }}"></script>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="{{ url_for('static', filename='icons/icon-192.png') }}">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/apple-touch-icon.png') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v=2) }}">
+</head>
+<body>
+  <div class="center-wrap">
+    <form class="login-card" method="post" action="{{ url_for('login') }}">
+      <div class="brand-icon big">&#9819;</div>
+      <h1>GREAT MEGA</h1>
+      <p class="lead">Log in to your trading workspace.</p>
+
+      <label class="field-label" for="password">Password</label>
+      <input class="select" type="password" id="password" name="password" autocomplete="current-password" autofocus required>
+
+      {% if error %}<p class="form-error" role="alert">{{ error }}</p>{% endif %}
+
+      <button class="btn btn-primary btn-block" type="submit">Log in</button>
+      <p class="notice">Forgot it? On the computer that runs GREAT MEGA, run <code>py set_password.py</code>.</p>
+    </form>
+  </div>
+</body>
+</html>

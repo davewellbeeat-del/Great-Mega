@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#061326">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="GREAT MEGA">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>GREAT MEGA | Trading Dashboard</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="{{ url_for('static', filename='icons/icon-192.png') }}">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/apple-touch-icon.png') }}">
+  <script src="{{ url_for('static', filename='js/theme.js', v=2) }}"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v=2) }}">
+</head>
+<body>
+<div class="app">
+
+  <!-- ========== SIDEBAR ========== -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-icon">&#9819;</div>
+      <div>
+        <div class="brand-name">GREAT MEGA</div>
+        <div class="tagline">Trade smarter. Grow bigger.</div>
+      </div>
+    </div>
+
+    <nav id="nav">
+      <a class="nav-link" href="#dashboard" data-page="dashboard"><span class="ico">&#8962;</span>Dashboard</a>
+      <a class="nav-link" href="#bots"      data-page="bots"><span class="ico">&#9881;</span>Bot Control</a>
+      <a class="nav-link" href="#accounts"  data-page="accounts"><span class="ico">&#9635;</span>My Accounts</a>
+      <a class="nav-link" href="#analytics" data-page="analytics"><span class="ico">&#9637;</span>Analytics</a>
+      <a class="nav-link" href="#history"   data-page="history"><span class="ico">&#9719;</span>Trade History</a>
+      <a class="nav-link" href="#settings"  data-page="settings"><span class="ico">&#9881;</span>Settings</a>
+      <a class="nav-link" href="#support"   data-page="support"><span class="ico">?</span>Support</a>
+    </nav>
+
+    <div class="side-foot">Preview mode: bots are placeholders and place no trades.</div>
+  </aside>
+
+  <div class="content">
+
+    <!-- ========== TOP BAR ========== -->
+    <header class="topbar">
+      <div>
+        <div class="top-title" id="topTitle">Dashboard</div>
+        <div class="top-sub">Trading workspace &middot; Preview mode</div>
+      </div>
+
+      <div class="top-right">
+        <button class="btn btn-primary" id="installBtn" hidden>&#10515; Install app</button>
+        <div class="theme-wrap">
+          <button class="btn btn-secondary" id="themeBtn" aria-haspopup="true" aria-expanded="false">&#9680; Theme</button>
+          <div class="theme-pop" id="themePop" role="dialog" aria-label="Theme settings">
+            <h4>Accent colour</h4>
+            <div class="swatches" id="swatches"></div>
+            <label class="custom-row">
+              <span>Custom colour</span>
+              <input type="color" id="customColor" value="#1a7bff">
+            </label>
+            <h4>Background</h4>
+            <div class="bg-opts" id="bgOpts"></div>
+            <button class="btn btn-secondary btn-block" id="themeReset">Reset to default</button>
+          </div>
+        </div>
+        <span class="chip" id="mt5Chip" data-state="wait"><span class="dot">&#9679;</span><span class="chip-full" id="mt5ChipFull">Connecting to MT5&hellip;</span><span class="chip-short" id="mt5ChipShort">MT5</span></span>
+      </div>
+    </header>
+
+    <main>
+
+      <!-- ========== DASHBOARD ========== -->
+      <section class="page" id="page-dashboard">
+        <div class="banner-real" id="realBanner" hidden>
+          <strong>REAL ACCOUNT connected.</strong> GREAT MEGA is read-only: it cannot place, change or close trades.
+        </div>
+
+        <h1>Welcome to GREAT MEGA</h1>
+        <p class="lead">Your trading workspace at a glance.</p>
+
+        <div class="notice-box" id="mt5Notice" hidden></div>
+
+        <label class="field-label" for="accountSelect">Select account</label>
+        <select id="accountSelect" class="select">
+          <option>Not connected</option>
+        </select>
+
+        <div class="stats">
+          <div class="stat">
+            <span class="stat-label">Account Balance</span>
+            <span class="stat-value" id="statBalance">&mdash;</span>
+            <span class="stat-sub" id="statBalanceSub">MT5 not connected</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Equity</span>
+            <span class="stat-value" id="statEquity">&mdash;</span>
+            <span class="stat-sub" id="statEquitySub">MT5 not connected</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Open Profit</span>
+            <span class="stat-value" id="statProfit">&mdash;</span>
+            <span class="stat-sub" id="statProfitSub">MT5 not connected</span>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Active Bots</span>
+            <span class="stat-value" id="statActive">0 / 0</span>
+            <span class="stat-sub">Demo bot status</span>
+          </div>
+        </div>
+
+        <div class="dash-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <h3>Market Watch</h3>
+              <span class="tag" id="marketTag">Not connected</span>
+            </div>
+            <div id="marketRows"></div>
+          </div>
+
+          <div class="panel">
+            <h3>Quick Actions</h3>
+            <div class="qa">
+              <button class="qa-btn qa-start" id="startAll">Start All Bots</button>
+              <button class="qa-btn qa-stop" id="stopAll">Stop All Bots</button>
+              <a class="qa-btn qa-neutral" href="#analytics">View Analytics</a>
+            </div>
+            <hr class="divider">
+            <h3>Bot Summary</h3>
+            <div id="botSummary"></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h3>Open Positions</h3>
+            <span class="tag" id="posCount">0</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Symbol</th><th>Type</th><th class="num">Lots</th><th class="num">Open</th><th class="num">Current</th><th class="num">Profit</th><th>Bot</th></tr></thead>
+              <tbody id="positionsBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== BOT CONTROL ========== -->
+      <section class="page" id="page-bots">
+        <div class="page-head">
+          <div>
+            <h1>Bot Control</h1>
+            <p class="lead">Register, edit, activate and delete bots. Set the lot size while a bot is stopped.</p>
+          </div>
+          <button class="btn btn-primary" id="addBotBtn">+ Register New Bot</button>
+        </div>
+
+        <div class="bot-grid" id="botGrid"></div>
+
+        <div class="panel">
+          <h3>Recent Activity</h3>
+          <div id="activity"></div>
+        </div>
+      </section>
+
+      <!-- ========== MY ACCOUNTS ========== -->
+      <section class="page" id="page-accounts">
+        <div class="page-head">
+          <div>
+            <h1>My Accounts</h1>
+            <p class="lead">The MetaTrader 5 account GREAT MEGA is reading from.</p>
+          </div>
+          <button class="btn btn-primary" id="addAccountBtn">Use a different account</button>
+        </div>
+        <div class="panel" id="accountCard"></div>
+      </section>
+
+      <!-- ========== ANALYTICS ========== -->
+      <section class="page" id="page-analytics">
+        <h1>Analytics</h1>
+        <p class="lead">Backtest and live performance.</p>
+        <div class="panel empty">Performance charts will appear here.</div>
+      </section>
+
+      <!-- ========== TRADE HISTORY ========== -->
+      <section class="page" id="page-history">
+        <h1>Trade History</h1>
+        <p class="lead">Closed trades from the last 30 days (times are your broker's server time).</p>
+        <div class="panel">
+          <div class="panel-head">
+            <h3>Closed trades</h3>
+            <span class="tag" id="historySummary">&mdash;</span>
+          </div>
+          <p class="muted" id="historyNote" hidden></p>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Time</th><th>Symbol</th><th>Type</th><th class="num">Lots</th><th class="num">Price</th><th class="num">Profit</th><th class="num">Net</th><th>Magic</th></tr></thead>
+              <tbody id="historyBody"><tr><td colspan="8" class="empty-cell">Loading&hellip;</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== SETTINGS ========== -->
+      <section class="page" id="page-settings">
+        <h1>Settings</h1>
+        <p class="lead">Platform information and preferences.</p>
+        <div class="panel">
+          <h3>Platform Information</h3>
+          <p class="muted info-lines">
+            Platform: GREAT MEGA<br>
+            Version: 2.0<br>
+            Trading terminal: MetaTrader 5 (read-only link)<br>
+            Website status: read-only, no trades are placed<br>
+            Maximum lot size per bot: <span id="maxLotInfo">10.00</span>
+          </p>
+        </div>
+        <div class="panel">
+          <h3>MetaTrader 5</h3>
+          <p class="muted" id="mt5Message">Checking&hellip;</p>
+          <dl class="kv" id="mt5Info"></dl>
+          <div class="form-group">
+            <label for="watchlistInput">Market Watch symbols, separated by commas (use the names your broker uses)</label>
+            <input type="text" id="watchlistInput" placeholder="XAUUSD, EURUSD, GBPUSD, USDJPY" maxlength="200">
+          </div>
+          <p class="form-error" id="watchError" role="alert"></p>
+          <div class="pw-actions">
+            <button class="btn btn-primary" id="watchlistSave">Save symbols</button>
+            <button class="btn btn-secondary" id="mt5Reconnect">Reconnect to MT5</button>
+          </div>
+          <p class="notice">This link is read-only: GREAT MEGA can only read your account. It cannot place, change or close trades.</p>
+        </div>
+        <div class="panel">
+          <h3>Security</h3>
+          <p class="muted" id="authInfo">Checking&hellip;</p>
+          <form id="passwordForm" class="pw-form" autocomplete="off">
+            <div class="form-group" id="currentPwRow" hidden>
+              <label for="pwCurrent">Current password</label>
+              <input type="password" id="pwCurrent" autocomplete="current-password">
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="pwNew">New password (8+ characters)</label>
+                <input type="password" id="pwNew" autocomplete="new-password">
+              </div>
+              <div class="form-group">
+                <label for="pwRepeat">Repeat new password</label>
+                <input type="password" id="pwRepeat" autocomplete="new-password">
+              </div>
+            </div>
+            <p class="form-error" id="pwError" role="alert"></p>
+            <div class="pw-actions">
+              <button type="submit" class="btn btn-primary" id="pwSubmit">Set password</button>
+              <button type="button" class="btn btn-danger" id="pwRemove" hidden>Remove password</button>
+              <button type="button" class="btn btn-secondary" id="logoutBtn" hidden>Log out</button>
+            </div>
+          </form>
+        </div>
+        <div class="panel">
+          <h3>Install as an app</h3>
+          <p class="muted info-lines">
+            <strong>Windows:</strong> double-click <em>Start GREAT MEGA.bat</em> (or <em>GreatMega.exe</em>).<br>
+            <strong>Android (Chrome):</strong> menu &#8942; &rarr; Install app / Add to Home screen.<br>
+            <strong>iPhone (Safari):</strong> Share &rarr; Add to Home Screen.<br>
+            Full instructions for using it on your phone are in <em>PHONE_SETUP.md</em>.
+          </p>
+        </div>
+        <div class="panel">
+          <h3>Appearance</h3>
+          <p class="muted">Use the <strong>Theme</strong> button at the top right to change the accent colour and background. Your choice is remembered in this browser.</p>
+        </div>
+      </section>
+
+      <!-- ========== SUPPORT ========== -->
+      <section class="page" id="page-support">
+        <h1>Support</h1>
+        <p class="lead">Help and contact details.</p>
+        <div class="panel empty">Support contact details will go here.</div>
+      </section>
+
+      <footer>GREAT MEGA &copy; 2026 &nbsp;|&nbsp; Trading Control Platform</footer>
+    </main>
+  </div>
+</div>
+
+<!-- ========== REGISTER / EDIT BOT ========== -->
+<div class="modal" id="botModal" aria-hidden="true">
+  <div class="modal-box" role="dialog" aria-labelledby="modalTitle">
+    <h2 id="modalTitle">Register New Bot</h2>
+    <form id="botForm" novalidate>
+      <input type="hidden" id="botId">
+
+      <div class="form-group">
+        <label for="botName">Bot Name</label>
+        <input type="text" id="botName" maxlength="40" placeholder="e.g. GREAT MEGA 1" required>
+      </div>
+      <div class="form-group">
+        <label for="botDescription">Bot Description</label>
+        <input type="text" id="botDescription" maxlength="200" placeholder="Describe your trading strategy">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="botMagic">Magic Number</label>
+          <input type="number" id="botMagic" min="1" step="1" placeholder="e.g. 27895" required>
+        </div>
+        <div class="form-group">
+          <label for="botLot">Lot Size</label>
+          <input type="number" id="botLot" min="0.01" max="10" step="0.01" value="0.01" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="botInstrument">Trading Instrument</label>
+        <select id="botInstrument">
+          <option value="Forex">Forex</option>
+          <option value="Gold / Metals">Gold / Metals</option>
+          <option value="Indices">Indices</option>
+          <option value="Multiple Instruments" selected>Multiple Instruments</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="botFile">EA Filename (optional)</label>
+        <input type="text" id="botFile" maxlength="100" placeholder="e.g. GREAT MEGA 1.ex5">
+      </div>
+
+      <p class="form-error" id="formError" role="alert"></p>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" id="cancelModal">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Bot</button>
+      </div>
+    </form>
+    <p class="notice">Bot details are saved on the server. Bots do not place trades or connect to MT5 yet.</p>
+  </div>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script src="{{ url_for('static', filename='js/app.js', v=2) }}"></script>
+</body>
+</html>
